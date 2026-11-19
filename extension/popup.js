@@ -21,7 +21,7 @@ const T = {
   no_servers: ["Серверы для браузера скоро появятся.", "Browser servers are coming soon."],
   other_ext: ["Прокси браузера сейчас управляет другое расширение или политика. Отключите его, чтобы fsociety NET заработал.", "Another extension or a policy controls the browser proxy. Disable it so fsociety NET can work."],
   server: ["Сервер", "Server"],
-  back: ["← Назад", "← Back"],
+  back_tip: ["Назад", "Back"],
   login_title: ["Вход в fsociety NET", "Sign in to fsociety NET"],
   tab_pass: ["Email или логин", "Email or login"],
   tab_code: ["Код аккаунта", "Account code"],

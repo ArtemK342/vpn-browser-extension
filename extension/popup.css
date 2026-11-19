@@ -88,20 +88,24 @@ a:hover { text-decoration: underline; }
   text-align: center;
 }
 .view.list { align-items: stretch; text-align: left; gap: 12px; overflow-y: auto; }
-#view-home { padding-top: 16px; }
+#view-home { padding-top: 12px; }
+/* Status block sits in the middle of the space above the button */
+.home-center { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#view-home .primary { margin-top: 12px; }
 
 h1 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
-.status { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.status { display: flex; align-items: center; gap: 10px; }
 .status .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dim); box-shadow: 0 0 0 4px rgba(255,255,255,.03); transition: background .3s, box-shadow .3s; }
 .status.on { color: var(--accent); }
 .status.on .dot { background: var(--accent); box-shadow: 0 0 0 4px rgba(200,241,53,.12), 0 0 14px rgba(200,241,53,.6); }
 .status.busy .dot { background: var(--accent); animation: pulse 1s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: .25; } }
 h2 { font-size: 18px; font-weight: 700; }
-#view-login h2 { margin-bottom: 14px; align-self: flex-start; }
+.login-head { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+.login-head h2 { font-size: 17px; }
 .muted { color: var(--muted); }
 .small { font-size: 12px; }
-#subtitle { font-size: 12.5px; margin-top: 6px; min-height: 36px; max-width: 300px; }
+#subtitle { font-size: 12.5px; margin-top: 6px; max-width: 300px; }
 
 /* Server picker */
 .picker { position: relative; width: 100%; margin-top: 16px; }
@@ -158,7 +162,6 @@ h2 { font-size: 18px; font-weight: 700; }
   transition: background .15s, border-color .15s, color .15s, transform .05s, opacity .15s;
 }
 .primary { background: var(--accent); color: #0d0d0d; }
-#view-home .primary { margin-top: auto; }
 .primary:hover { background: var(--accent2); }
 .primary:active, .secondary:active { transform: translateY(1px); }
 .primary:disabled { opacity: .45; cursor: default; }
@@ -198,15 +201,16 @@ h2 { font-size: 18px; font-weight: 700; }
 
 /* Login */
 #view-login { align-items: stretch; text-align: left; }
-.back { align-self: flex-start; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
-.back:hover { color: var(--text); }
-.tabs { display: flex; gap: 4px; padding: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px; }
-.tab { flex: 1; padding: 7px; border-radius: 7px; font-size: 12.5px; color: var(--muted); }
+.back { width: 28px; height: 28px; margin-left: -6px; border-radius: 7px; display: grid; place-items: center; color: var(--muted); }
+.back svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.back:hover { color: var(--text); background: var(--surface); }
+.tabs { display: flex; gap: 4px; padding: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+.tab { flex: 1; padding: 6px; border-radius: 7px; font-size: 12.5px; color: var(--muted); }
 .tab.active { background: var(--dim); color: var(--text); }
-form { display: flex; flex-direction: column; gap: 10px; }
+form { display: flex; flex-direction: column; gap: 8px; }
 input:not([type=checkbox]) {
   width: 100%;
-  padding: 12px;
+  padding: 10px 12px;
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 9px;
@@ -216,9 +220,11 @@ input:not([type=checkbox]) {
   transition: border-color .15s;
 }
 input:focus { border-color: var(--accent); }
-form .primary { margin-top: 4px; }
+form .primary { margin-top: 2px; padding: 11px; }
 .error { color: var(--danger); font-size: 12.5px; margin-top: 10px; }
-#view-login .small { margin-top: 14px; }
+#view-login { padding-top: 14px; padding-bottom: 10px; overflow-y: auto; }
+#view-login .small { margin-top: 10px; }
+#view-login .error { margin-top: 8px; }
 
 /* Bottom bar */
 .bottom {
@@ -251,3 +257,11 @@ form .primary { margin-top: 4px; }
 .switch[aria-checked="true"] .knob { background: rgba(200,241,53,.25); }
 .switch[aria-checked="true"] .knob::after { transform: translateX(16px); background: var(--accent); }
 .switch:disabled { opacity: .4; cursor: default; }
+
+/* Browser autofill: keep our dark field instead of the light-blue one */
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 40px var(--bg2) inset;
+  caret-color: var(--text);
+  transition: background-color 9999s;
+}

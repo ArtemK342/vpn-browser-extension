@@ -134,8 +134,9 @@ async function connect(id) {
   const { selected } = await store.get("selected");
   const want = id || selected;
   const p = creds.proxies.find((x) => x.id === want) || creds.proxies[0];
-  await applyProxy(p);
+  // enabled before the proxy goes live: the first 407 arrives right away and onAuthRequired must already answer
   await store.set({ enabled: true, selected: p.id });
+  try { await applyProxy(p); } catch (e) { await store.set({ enabled: false }); throw e; }
   await applyWebrtc((await settings()).webrtc);
   chrome.alarms.create(ALARM, { periodInMinutes: 30 });
   await paint();
@@ -163,29 +164,30 @@ async function paint() {
 }
 
 // Credentials for our proxy only (challenger = the proxy we set)
+// Credentials for our proxy only (challenger = one of our proxies). Never return {} for ours: that makes the
+// browser show its own login dialog. Second ask for the same request = wrong / expired password → renew once.
+const seen = new Map();   // requestId → tries
 chrome.webRequest.onAuthRequired.addListener(
   (details, callback) => {
     if (!details.isProxy) { callback({}); return; }
-    store.get(["creds", "enabled"]).then(({ creds, enabled }) => {
-      const ours = enabled && creds && creds.proxies &&
-        creds.proxies.some((p) => p.host === details.challenger.host && Number(p.port) === details.challenger.port);
-      // Second ask for the same request = wrong / expired password: renew once, then give up (no loop)
-      if (!ours) { callback({}); return; }
-      if (seen.has(details.requestId)) {
-        seen.delete(details.requestId);
-        fetchCreds().catch(() => {});
-        callback({ cancel: true });
-        return;
+    (async () => {
+      let { creds } = await store.get("creds");
+      const isOurs = (c) => c && c.proxies &&
+        c.proxies.some((p) => p.host === details.challenger.host && Number(p.port) === Number(details.challenger.port));
+      if (!isOurs(creds)) { callback({}); return; }
+      const tries = seen.get(details.requestId) || 0;
+      if (tries >= 2) { seen.delete(details.requestId); callback({ cancel: true }); return; }
+      if (tries === 1 || !creds.password || creds.expires - Date.now() / 1000 < 60) {
+        try { creds = await fetchCreds(); } catch { callback({ cancel: true }); return; }
       }
-      seen.add(details.requestId);
+      seen.set(details.requestId, tries + 1);
       setTimeout(() => seen.delete(details.requestId), 60000);
       callback({ authCredentials: { username: creds.username, password: creds.password } });
-    });
+    })().catch(() => callback({ cancel: true }));
   },
   { urls: ["<all_urls>"] },
   ["asyncBlocking"]
 );
-const seen = new Set();
 
 chrome.proxy.onProxyError.addListener(async (e) => {
   await store.set({ lastProxyError: { at: Date.now(), error: e.error } });

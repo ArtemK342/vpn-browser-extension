@@ -13,6 +13,7 @@
 
   <!-- Home: server + connect -->
   <main id="view-home" class="view">
+    <div class="home-center">
     <h1 id="title" class="status"><span class="dot"></span><span id="titleText"></span></h1>
     <p id="subtitle" class="muted"></p>
 
@@ -26,6 +27,7 @@
     </div>
 
     <div id="notice" class="notice" hidden></div>
+    </div>
 
     <button id="primary" class="primary" type="button"></button>
   </main>
@@ -65,8 +67,12 @@
 
   <!-- Login -->
   <section id="view-login" class="view" hidden>
-    <button id="back" class="back" type="button" data-t="back"></button>
-    <h2 data-t="login_title"></h2>
+    <div class="login-head">
+      <button id="back" class="back" type="button" data-tip="back_tip">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <h2 data-t="login_title"></h2>
+    </div>
     <div class="tabs" role="tablist">
       <button type="button" class="tab active" data-tab="pass" data-t="tab_pass"></button>
       <button type="button" class="tab" data-tab="code" data-t="tab_code"></button>
