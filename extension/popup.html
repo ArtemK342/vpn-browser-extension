@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>fsociety NET</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <span class="brand"><img src="icons/on-32.png" alt="" width="24" height="24"><span class="logo">fsociety <b>NET</b></span></span>
+    <button id="account" class="ghost" type="button"></button>
+  </header>
+
+  <!-- Home: server + connect -->
+  <main id="view-home" class="view">
+    <div class="orb" id="orb">
+      <div class="ring"></div>
+      <div class="core">[<span>f</span>]</div>
+    </div>
+    <h1 id="title"></h1>
+    <p id="subtitle" class="muted"></p>
+
+    <label id="serverRow" class="server" hidden>
+      <span class="server-label" data-t="server"></span>
+      <select id="server"></select>
+    </label>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <button id="primary" class="primary" type="button"></button>
+  </main>
+
+  <!-- Settings -->
+  <section id="view-settings" class="view list" hidden>
+    <div class="row">
+      <span data-t="lang"></span>
+      <div class="seg" id="lang">
+        <button type="button" data-v="auto" data-t="lang_auto"></button>
+        <button type="button" data-v="ru">RU</button>
+        <button type="button" data-v="en">EN</button>
+      </div>
+    </div>
+    <label class="row check">
+      <input type="checkbox" id="set-webrtc">
+      <span class="tgl"></span>
+      <span><span data-t="webrtc"></span><small class="muted" data-t="webrtc_hint"></small></span>
+    </label>
+    <label class="row check">
+      <input type="checkbox" id="set-autostart">
+      <span class="tgl"></span>
+      <span><span data-t="autostart"></span><small class="muted" data-t="autostart_hint"></small></span>
+    </label>
+    <button id="diagBtn" class="secondary" type="button" data-t="diag"></button>
+    <pre id="diag" class="diag" hidden></pre>
+  </section>
+
+  <!-- Support -->
+  <section id="view-support" class="view list" hidden>
+    <h2 data-t="support_title"></h2>
+    <p class="muted" data-t="support_text"></p>
+    <button class="primary" type="button" data-open="/ticket/" data-t="support_btn"></button>
+    <button class="secondary" type="button" data-open="/faq/" data-t="faq_btn"></button>
+    <p class="muted small ver" id="ver"></p>
+  </section>
+
+  <!-- Login -->
+  <section id="view-login" class="view" hidden>
+    <button id="back" class="back" type="button" data-t="back"></button>
+    <h2 data-t="login_title"></h2>
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" data-tab="pass" data-t="tab_pass"></button>
+      <button type="button" class="tab" data-tab="code" data-t="tab_code"></button>
+    </div>
+    <form id="formPass" autocomplete="on">
+      <input id="user" name="username" autocomplete="username" required>
+      <input id="pass" name="password" type="password" autocomplete="current-password" required>
+      <button class="primary" type="submit" data-t="login_btn"></button>
+    </form>
+    <form id="formCode" hidden autocomplete="off">
+      <input id="code" inputmode="numeric" maxlength="19" required>
+      <button class="primary" type="submit" data-t="login_btn"></button>
+    </form>
+    <p id="loginError" class="error" hidden></p>
+    <p class="muted small"><span data-t="no_account"></span> <a href="#" data-open="/register/" data-t="register"></a></p>
+  </section>
+
+  <footer class="bottom">
+    <nav class="tabbar">
+      <button type="button" class="nav active" data-view="home" data-tip="nav_home">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+      </button>
+      <button type="button" class="nav" data-view="settings" data-tip="nav_settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+      <button type="button" class="nav" id="tg" data-tip="nav_tg">
+        <svg viewBox="0 0 24 24"><path d="m21.5 4.5-3.2 15.1c-.2 1-.9 1.3-1.8.8l-4.8-3.6-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2L5.9 13.3 1.2 11.8c-1-.3-1-1 .2-1.5L20.1 3.1c.9-.3 1.6.2 1.4 1.4z"/></svg>
+      </button>
+      <button type="button" class="nav" data-view="support" data-tip="nav_support">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.3-2.5 3.9"/><circle cx="12" cy="17.2" r=".6"/></svg>
+      </button>
+      <span class="nav-label" id="navLabel"></span>
+    </nav>
+    <button id="toggle" class="switch" type="button" role="switch" aria-checked="false">
+      <span class="knob"></span><span class="switch-text"></span>
+    </button>
+  </footer>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

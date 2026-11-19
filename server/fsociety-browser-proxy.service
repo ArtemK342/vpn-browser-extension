@@ -1,0 +1,26 @@
+[Unit]
+Description=fsociety NET HTTPS proxy for the browser extension
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# BROWSER_PROXY_KEY (= the API's), PORT, CERT, KEY — in /etc/fsociety-browser-proxy.env (600 root)
+EnvironmentFile=/etc/fsociety-browser-proxy.env
+ExecStart=/usr/bin/python3 -I /opt/fsociety-browser-proxy/fsociety_browser_proxy.py
+DynamicUser=yes
+# Let's Encrypt keys are root-only: systemd hands copies to the service user
+LoadCredential=cert:/etc/letsencrypt/live/%i/fullchain.pem
+LoadCredential=key:/etc/letsencrypt/live/%i/privkey.pem
+AmbientCapabilities=
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+LimitNOFILE=65536
+Restart=always
+RestartSec=3
+# No logs of users or sites: the daemon prints nothing; journal gets only crashes
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
