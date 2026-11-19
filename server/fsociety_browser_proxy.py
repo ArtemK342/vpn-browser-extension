@@ -7,7 +7,7 @@ TLS on PORT with a real certificate (Chrome refuses self-signed proxies). Auth: 
 sites) and plain http:// requests. Never logs users or destinations (no-logs). Refuses private / local
 destinations and SMTP ports.
 
-Env: BROWSER_PROXY_KEY (required), PORT (8443), CERT, KEY (PEM paths), MAX_CONN_PER_USER (300).
+Env: BROWSER_PROXY_KEY (required), PORT (8443), BIND (listen IP, default all), CERT, KEY (PEM paths), MAX_CONN_PER_USER (300).
 Python 3.10+, stdlib only.
 """
 import asyncio
@@ -23,8 +23,11 @@ from urllib.parse import urlsplit
 
 KEY = os.environ.get("BROWSER_PROXY_KEY", "").encode()
 PORT = int(os.environ.get("PORT", "8443"))
-CERT = os.environ.get("CERT", "")
-PKEY = os.environ.get("KEY", "")
+BIND = os.environ.get("BIND") or None   # one IP (e.g. not the API's), default all
+# systemd LoadCredential= (unit fsociety-browser-proxy@<domain>) → $CREDENTIALS_DIRECTORY/cert, /key
+_cred = os.environ.get("CREDENTIALS_DIRECTORY", "")
+CERT = os.environ.get("CERT") or (os.path.join(_cred, "cert") if _cred else "")
+PKEY = os.environ.get("KEY") or (os.path.join(_cred, "key") if _cred else "")
 MAX_CONN = int(os.environ.get("MAX_CONN_PER_USER", "300"))
 HEAD_MAX = 32 * 1024
 BLOCKED_PORTS = {25, 465, 587}
@@ -166,7 +169,7 @@ async def main():
         ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         ctx.minimum_version = ssl.TLSVersion.TLSv1_2
         ctx.load_cert_chain(CERT, PKEY)
-    srv = await asyncio.start_server(handle, host=None, port=PORT, ssl=ctx, limit=HEAD_MAX,
+    srv = await asyncio.start_server(handle, host=BIND, port=PORT, ssl=ctx, limit=HEAD_MAX,
                                      ssl_handshake_timeout=15 if ctx else None)
     async with srv:
         await srv.serve_forever()
