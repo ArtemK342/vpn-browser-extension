@@ -65,8 +65,8 @@ const send = inExtension
 
 function demoSend(type) {
   const mode = new URLSearchParams(location.search).get("demo") || "guest";
-  const px = [{ id: "de", name: "Германия", country: "DE" }, { id: "fi", name: "Финляндия", country: "FI" }];
-  const acc = { label: "user@mail.ru", plan: "month" };
+  const px = [{ id: "fi", name: "Финляндия", country: "FI" }, { id: "de", name: "Германия", country: "DE" }];
+  const acc = { label: "12130ar@gmail.com", plan: "month" };
   const d = {
     guest: { loggedIn: false, proxies: [], enabled: false },
     free: { loggedIn: true, account: { ...acc, plan: "free" }, proxies: [], enabled: false },
@@ -93,6 +93,19 @@ function errText(r) {
 const PRIVILEGED = ["tester", "developer", "admin", "superadmin"];
 const canUse = (a) => a && (a.plan !== "free" || PRIVILEGED.includes(a.role));
 const proxyName = (p) => p ? (p.name || p.country || p.id) : "";
+let selectedId = null;
+
+// "DE" → 🇩🇪 (regional indicators; drawn by the Twemoji flags font)
+const flag = (cc) => /^[A-Za-z]{2}$/.test(cc || "") ? [...cc.toUpperCase()].map((c) => String.fromCodePoint(0x1F1A5 + c.charCodeAt(0))).join("") : "🌐";
+
+// Account label is masked (shoulder surfing, screenshots): 12•••@gmail.com, lo•••
+function mask(label) {
+  if (!label) return t("code_account");
+  const at = label.indexOf("@");
+  const name = at > 0 ? label.slice(0, at) : label;
+  const shown = name.slice(0, Math.min(2, Math.max(1, name.length - 1)));
+  return shown + "•••" + (at > 0 ? label.slice(at) : "");
+}
 
 // ── Views ──
 function show(v) {
@@ -118,32 +131,44 @@ function render() {
   const s = state;
   const acc = $("account");
   if (!acc.dataset.armed) {
-    acc.textContent = s.loggedIn ? (s.account && s.account.label ? s.account.label : t("code_account")) : t("login");
+    acc.textContent = s.loggedIn ? mask(s.account && s.account.label) : t("login");
     acc.title = s.loggedIn ? t("logout_title") : "";
   }
 
-  const orb = $("orb"), title = $("title"), sub = $("subtitle"), btn = $("primary"), notice = $("notice");
-  const row = $("serverRow"), sel = $("server"), sw = $("toggle");
-  orb.classList.toggle("on", s.enabled);
-  orb.classList.toggle("busy", busy);
+  const title = $("title"), sub = $("subtitle"), btn = $("primary"), notice = $("notice");
+  const row = $("serverRow"), sw = $("toggle");
+  title.classList.toggle("on", s.enabled && !busy);
+  title.classList.toggle("busy", busy);
   notice.hidden = true;
   notice.className = "notice";
   notice.replaceChildren();
   btn.className = "primary";
   btn.disabled = busy;
 
-  const current = s.proxies.find((p) => p.id === s.selected) || s.proxies[0];
-  title.textContent = busy ? t("busy") : s.enabled ? t("on_title") : t("off_title");
+  const current = s.proxies.find((p) => p.id === (selectedId || s.selected)) || s.proxies[0];
+  selectedId = current ? current.id : null;
+  $("titleText").textContent = busy ? t("busy") : s.enabled ? t("on_title") : t("off_title");
   sub.textContent = s.enabled ? t("on_sub", { s: proxyName(current) }) : s.loggedIn ? t("off_sub") : t("guest_sub");
 
   row.hidden = !(s.loggedIn && s.proxies.length);
-  sel.replaceChildren(...s.proxies.map((p) => {
-    const o = document.createElement("option");
-    o.value = p.id; o.textContent = proxyName(p);
-    return o;
+  if (current) {
+    $("serverFlag").textContent = flag(current.country);
+    $("serverName").textContent = proxyName(current);
+  }
+  $("serverBtn").disabled = busy || s.proxies.length < 2;
+  $("serverList").replaceChildren(...s.proxies.map((p) => {
+    const li = document.createElement("li");
+    li.setAttribute("role", "option");
+    li.tabIndex = 0;
+    li.setAttribute("aria-selected", String(current && p.id === current.id));
+    li.innerHTML = '<span class="flag"></span><span class="nm"></span><svg class="ok" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+    li.querySelector(".flag").textContent = flag(p.country);
+    li.querySelector(".nm").textContent = proxyName(p);
+    const pick = () => choose(p.id);
+    li.onclick = pick;
+    li.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } };
+    return li;
   }));
-  if (current) sel.value = current.id;
-  sel.disabled = busy;
 
   const say = (text, warn) => { notice.append(text); notice.hidden = false; if (warn) notice.classList.add("warn"); };
   if (s.error === "subscription_required") say(t("expired"), true);
@@ -210,7 +235,22 @@ async function run(type, data) {
   return r;
 }
 
-const connect = () => run("connect", { id: $("server").value });
+const connect = () => run("connect", { id: selectedId });
+
+function togglePicker(open) {
+  const list = $("serverList"), btn = $("serverBtn");
+  const show = open ?? list.hidden;
+  list.hidden = !show;
+  btn.setAttribute("aria-expanded", String(show));
+  if (show) (list.querySelector('[aria-selected="true"]') || list.firstChild)?.focus();
+}
+
+function choose(id) {
+  togglePicker(false);
+  if (id === selectedId) return;
+  selectedId = id;
+  if (state.enabled) connect(); else render();
+}
 const disconnect = () => run("disconnect");
 const refresh = () => run("refresh");
 
@@ -279,7 +319,9 @@ function init() {
     const d = e.target.value.replace(/\D/g, "").slice(0, 16);
     e.target.value = d.replace(/(\d{4})(?=\d)/g, "$1-");
   };
-  $("server").onchange = () => { if (state.enabled) connect(); };
+  $("serverBtn").onclick = (e) => { e.stopPropagation(); togglePicker(); };
+  document.addEventListener("click", (e) => { if (!$("serverRow").contains(e.target)) togglePicker(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") togglePicker(false); });
   $("toggle").onclick = () => (state.enabled ? disconnect() : connect());
 
   for (const b of $("lang").children) b.onclick = () => setSetting({ lang: b.dataset.v });

@@ -7,23 +7,23 @@
 </head>
 <body>
   <header class="top">
-    <span class="brand"><img src="icons/on-32.png" alt="" width="24" height="24"><span class="logo">fsociety <b>NET</b></span></span>
+    <span class="brand"><span class="logo">[<span>f</span>]society</span><span class="brand-sub">VPN · Browser</span></span>
     <button id="account" class="ghost" type="button"></button>
   </header>
 
   <!-- Home: server + connect -->
   <main id="view-home" class="view">
-    <div class="orb" id="orb">
-      <div class="ring"></div>
-      <div class="core">[<span>f</span>]</div>
-    </div>
-    <h1 id="title"></h1>
+    <h1 id="title" class="status"><span class="dot"></span><span id="titleText"></span></h1>
     <p id="subtitle" class="muted"></p>
 
-    <label id="serverRow" class="server" hidden>
-      <span class="server-label" data-t="server"></span>
-      <select id="server"></select>
-    </label>
+    <div id="serverRow" class="picker" hidden>
+      <button id="serverBtn" class="picker-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <span class="flag" id="serverFlag"></span>
+        <span class="picker-text"><span class="picker-sub" data-t="server"></span><span id="serverName"></span></span>
+        <svg class="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <ul id="serverList" class="picker-list" role="listbox" hidden></ul>
+    </div>
 
     <div id="notice" class="notice" hidden></div>
 
