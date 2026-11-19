@@ -16,7 +16,12 @@ Manifest V3, Chromium 108+. Только по подписке: бесплатн
    через `webRequest.onAuthRequired`.
 3. Прокси на сервере проверяет HMAC сам, без БД. Логов пользователей и сайтов нет. Локальные адреса и SMTP закрыты.
 
-## Установка для теста
+## Установка
+Скачайте `fsociety-net-extension.zip` с https://fsociety-vpn.org/download или из
+[релизов](https://github.com/ArtemK342/vpn-browser-extension/releases/latest), распакуйте в постоянную папку,
+затем chrome://extensions (browser://extensions в Яндексе) → «Режим разработчика» → «Загрузить распакованное».
+
+## Установка из исходников
 chrome://extensions (или browser://extensions в Яндексе) → «Режим разработчика» → «Загрузить распакованное»
 → папка `extension`.
 
