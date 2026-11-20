@@ -68,7 +68,7 @@ const send = inExtension
 function demoSend(type) {
   const mode = new URLSearchParams(location.search).get("demo") || "guest";
   const px = [{ id: "fi", name: "Финляндия", country: "FI" }, { id: "de", name: "Германия", country: "DE" }];
-  const acc = { label: "12130ar@gmail.com", plan: "month" };
+  const acc = { label: "demo@example.com", plan: "month" };
   const d = {
     guest: { loggedIn: false, proxies: [], enabled: false },
     free: { loggedIn: true, account: { ...acc, plan: "free" }, proxies: [], enabled: false },
