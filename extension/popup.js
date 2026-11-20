@@ -49,6 +49,7 @@ const T = {
   support_text: ["Что-то не работает или есть вопрос? Напишите нам — ответим на сайте и на почту.", "Something isn't working or have a question? Write to us — we reply on the site and by email."],
   support_btn: ["Написать в поддержку", "Contact support"],
   faq_btn: ["Частые вопросы", "FAQ"],
+  official: ["Официальный сайт — только fsociety-vpn.org. Похожие сервисы к нам отношения не имеют.", "The only official site is fsociety-vpn.org. Look-alike services are not related to us."],
   err_network: ["Нет связи с сервером fsociety. Проверьте интернет.", "Can't reach fsociety. Check your connection."],
   err_unauthorized: ["Неверный логин или пароль.", "Wrong login or password."],
   err_generic: ["Что-то пошло не так. Попробуйте ещё раз.", "Something went wrong. Please try again."],
