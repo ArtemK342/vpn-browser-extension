@@ -2,7 +2,9 @@
 // Login (same API as the apps), HTTPS proxy credentials from /api/vpn/browser-proxy (paid accounts only,
 // live 12 h, renewed here), chrome.proxy fixed_servers + proxy auth via webRequest.onAuthRequired.
 
-const API = ["https://fsociety-vpn.org/api/", "https://api.fsociety-vpn.org/api/"]; // Cloudflare, then direct
+// Direct first (our server; no access log), Cloudflare only as a fallback — like the apps' anonymous accounts:
+// otherwise Cloudflare would see the IP and the password on every sign-in (privacy audit 2026-11-20)
+const API = ["https://api.fsociety-vpn.org/api/", "https://fsociety-vpn.org/api/"];
 const RENEW_BEFORE = 2 * 3600;   // renew proxy credentials when < 2 h left
 const ALARM = "renew";
 
