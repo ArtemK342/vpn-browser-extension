@@ -1,5 +1,6 @@
 // Popup: renders the state the service worker keeps; every action goes through it (background.js).
 const SITE = "https://fsociety-vpn.org";
+const TG = "https://t.me/fsocietynet_vpn";
 
 const T = {
   login: ["Войти", "Sign in"],
@@ -35,7 +36,7 @@ const T = {
   sw_off: ["ВЫКЛ", "OFF"],
   nav_home: ["Главная", "Home"],
   nav_settings: ["Настройки", "Settings"],
-  nav_tg: ["Telegram — скоро", "Telegram — soon"],
+  nav_tg: ["Telegram-канал", "Telegram channel"],
   nav_support: ["Поддержка", "Support"],
   lang: ["Язык", "Language"],
   lang_auto: ["Авто", "Auto"],
@@ -287,8 +288,11 @@ function init() {
 
   for (const a of document.querySelectorAll("[data-open]")) a.onclick = (e) => { e.preventDefault(); open(a.dataset.open); };
   for (const b of document.querySelectorAll(".nav[data-view]")) b.onclick = () => show(b.dataset.view);
-  $("tg").classList.add("soon");
-  $("tg").onclick = () => { $("navLabel").textContent = t("nav_tg"); };   // the app's Telegram — link later
+  $("tg").onclick = () => {   // our Telegram channel
+    if (!inExtension) return void window.open(TG);
+    chrome.tabs.create({ url: TG });
+    window.close();
+  };
 
   $("back").onclick = () => show("home");
   $("account").onclick = async () => {
